@@ -17,8 +17,13 @@ const SettingsSchema = CollectionSchema(
   name: r'Settings',
   id: -8656046621518759136,
   properties: {
-    r'theme': PropertySchema(
+    r'isDark': PropertySchema(
       id: 0,
+      name: r'isDark',
+      type: IsarType.bool,
+    ),
+    r'theme': PropertySchema(
+      id: 1,
       name: r'theme',
       type: IsarType.string,
     )
@@ -58,7 +63,8 @@ void _settingsSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeString(offsets[0], object.theme);
+  writer.writeBool(offsets[0], object.isDark);
+  writer.writeString(offsets[1], object.theme);
 }
 
 Settings _settingsDeserialize(
@@ -67,9 +73,11 @@ Settings _settingsDeserialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  final object = Settings();
-  object.id = id;
-  object.theme = reader.readStringOrNull(offsets[0]);
+  final object = Settings(
+    id: id,
+    isDark: reader.readBool(offsets[0]),
+    theme: reader.readStringOrNull(offsets[1]),
+  );
   return object;
 }
 
@@ -81,6 +89,8 @@ P _settingsDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
+      return (reader.readBool(offset)) as P;
+    case 1:
       return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -88,7 +98,7 @@ P _settingsDeserializeProp<P>(
 }
 
 Id _settingsGetId(Settings object) {
-  return object.id;
+  return object.id ?? Isar.autoIncrement;
 }
 
 List<IsarLinkBase<dynamic>> _settingsGetLinks(Settings object) {
@@ -176,7 +186,23 @@ extension SettingsQueryWhere on QueryBuilder<Settings, Settings, QWhereClause> {
 
 extension SettingsQueryFilter
     on QueryBuilder<Settings, Settings, QFilterCondition> {
-  QueryBuilder<Settings, Settings, QAfterFilterCondition> idEqualTo(Id value) {
+  QueryBuilder<Settings, Settings, QAfterFilterCondition> idIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'id',
+      ));
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterFilterCondition> idIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'id',
+      ));
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterFilterCondition> idEqualTo(Id? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'id',
@@ -186,7 +212,7 @@ extension SettingsQueryFilter
   }
 
   QueryBuilder<Settings, Settings, QAfterFilterCondition> idGreaterThan(
-    Id value, {
+    Id? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -199,7 +225,7 @@ extension SettingsQueryFilter
   }
 
   QueryBuilder<Settings, Settings, QAfterFilterCondition> idLessThan(
-    Id value, {
+    Id? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -212,8 +238,8 @@ extension SettingsQueryFilter
   }
 
   QueryBuilder<Settings, Settings, QAfterFilterCondition> idBetween(
-    Id lower,
-    Id upper, {
+    Id? lower,
+    Id? upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -224,6 +250,16 @@ extension SettingsQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterFilterCondition> isDarkEqualTo(
+      bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'isDark',
+        value: value,
       ));
     });
   }
@@ -382,6 +418,18 @@ extension SettingsQueryLinks
     on QueryBuilder<Settings, Settings, QFilterCondition> {}
 
 extension SettingsQuerySortBy on QueryBuilder<Settings, Settings, QSortBy> {
+  QueryBuilder<Settings, Settings, QAfterSortBy> sortByIsDark() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isDark', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterSortBy> sortByIsDarkDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isDark', Sort.desc);
+    });
+  }
+
   QueryBuilder<Settings, Settings, QAfterSortBy> sortByTheme() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'theme', Sort.asc);
@@ -409,6 +457,18 @@ extension SettingsQuerySortThenBy
     });
   }
 
+  QueryBuilder<Settings, Settings, QAfterSortBy> thenByIsDark() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isDark', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Settings, Settings, QAfterSortBy> thenByIsDarkDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isDark', Sort.desc);
+    });
+  }
+
   QueryBuilder<Settings, Settings, QAfterSortBy> thenByTheme() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'theme', Sort.asc);
@@ -424,6 +484,12 @@ extension SettingsQuerySortThenBy
 
 extension SettingsQueryWhereDistinct
     on QueryBuilder<Settings, Settings, QDistinct> {
+  QueryBuilder<Settings, Settings, QDistinct> distinctByIsDark() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isDark');
+    });
+  }
+
   QueryBuilder<Settings, Settings, QDistinct> distinctByTheme(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -437,6 +503,12 @@ extension SettingsQueryProperty
   QueryBuilder<Settings, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<Settings, bool, QQueryOperations> isDarkProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isDark');
     });
   }
 
