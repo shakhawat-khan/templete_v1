@@ -55,11 +55,11 @@ class MyApp extends StatelessWidget {
         title: 'Flutter Demo',
         // theme: lol == null ? MyThemes.darkTheme : MyThemes.lightTheme,
 
-        theme: ref
-                .watch(settingsStreamProvider)
-                .when(data: (data) {}, error: (e, t) {}, loading: () => {})
-            ? MyThemes.darkTheme
-            : MyThemes.lightTheme,
+        // theme: ref
+        //         .watch(settingsStreamProvider)
+        //         .when(data: (data) {}, error: (e, t) {}, loading: () => {})
+        //     ? MyThemes.darkTheme
+        //     : MyThemes.lightTheme,
         //themeMode: ThemeMode.system,
         home: MyhomePage(
           isDark: isDark,
